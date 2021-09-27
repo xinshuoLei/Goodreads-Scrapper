@@ -4,8 +4,8 @@ and run corresponding functions
 '''
 import argparse
 import requests
-import Scrapper
-from Scrapper import *
+import scrapper
+from scrapper import *
 
 '''
 url prefix for goodreads
@@ -44,8 +44,8 @@ if __name__ == "__main__":
     if (args["scrap"] != None):
         scrap_args = args["scrap"]
         url = scrap_args[0];
-        num_books = scrap_args[1]
-        num_authors = scrap_args[2]
+        num_books = int(scrap_args[1])
+        num_authors = int(scrap_args[2])
         
         print(url)
         result = check_if_url_valid(url)
@@ -53,10 +53,11 @@ if __name__ == "__main__":
             print("invalid")
         else:
             print("valid")
-        
+            scrapper = Scrapper(url, num_books, num_authors)
+            
         print(num_books)
         print(num_authors)
 
-        scrapper = Scrapper(url, num_books, num_authors)
+        
 
         

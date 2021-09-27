@@ -1,6 +1,8 @@
 import requests
 import bs4
 
+''' This file contains scrapper for the book
+'''
 class BookScrapper():
 
     def __init__(self, book_url, id):

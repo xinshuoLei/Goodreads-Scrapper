@@ -2,6 +2,8 @@ import requests
 import bs4
 import time
 
+''' This file contains scrapper for authors
+'''
 class AuthorScrapper:
     
     def __init__(self, author_url, id):
@@ -57,7 +59,6 @@ class AuthorScrapper:
         # get urls on next page if there is a next page
         while (books_soup.find("a", class_ = "next_page") != None):
             # get url of next page
-            print("here")
             next = books_soup.find("a", class_ = "next_page")
             next_response = requests.get(self._GOODREADS_URL + next["href"])
             if next_response:
@@ -104,7 +105,8 @@ class AuthorScrapper:
                 for one_url in all_url:
                     # check to make sure the url is not a book page
                     if "book" not in one_url["href"] and "show" not in one_url["href"]:
-                        urls.append(one_url["href"])
+                        append_url = one_url["href"].replace("list", "show")
+                        urls.append(append_url)
 
         self._info["related_authors"] = urls[1:]
 
