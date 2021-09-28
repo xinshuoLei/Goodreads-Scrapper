@@ -104,8 +104,3 @@ def close_client(client):
     client.close()
 
 
-if __name__ == "__main__":
-    client = connect_to_server()
-    print(already_exist(1, False, client))
-    close_client(client)
-

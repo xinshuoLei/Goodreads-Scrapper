@@ -47,10 +47,11 @@ def check_if_url_valid(url):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-scrap", nargs=3)
+    parser.add_argument("-output", nargs=1)
     args = vars(parser.parse_args())
 
     # program was run with flag scrap
-    if (args["scrap"] != None):
+    if (args["scrap"] is not None):
         scrap_args = args["scrap"]
         url = scrap_args[0];
         num_books = int(scrap_args[1])
@@ -66,7 +67,22 @@ if __name__ == "__main__":
             
         if (num_books > 200 or num_authors > 2):
             print("warning: this is a really large number to scarp")
-
-        
+    
+    elif (args["output"] is not None):
+        output_arg = args["output"][0]
+        if (output_arg == "author"):
+            client = database.connect_to_server()
+            if client is not None:
+                database.output_data(True, client)
+            database.close_client(client)
+            print("output table author to data.json")
+        elif (output_arg == "book"):
+            client = database.connect_to_server()
+            if client is not None:
+                database.output_data(False, client)
+            database.close_client(client)
+            print("output table book to data.json")
+        else:
+            print("invalid argument")
 
         
