@@ -22,13 +22,17 @@ def connect_to_server():
 This file contains function that insert data into database
 and retrieve data from database
 '''
-def insert_data(is_author, data, client):
+def insert_data(is_author, is_test, data, client):
     ''' insert data into database
 
     Args:
         is_author: true if the data is about author, false if data is about book
+        is_test: true if use the collection for unit testing
         data: a dictionary containing the book data to insert 
         client: client to use
+
+    Return:
+        id inserted
     '''
     if client is None:
         return 
@@ -37,7 +41,11 @@ def insert_data(is_author, data, client):
     collection = db["book"]
     if (is_author):
         collection = db["author"]
-    collection.insert_one(data)
+    if (is_test):
+        collection = db["test"]
+    id = collection.insert_one(data)
+    return id
+
 
 def output_data(is_author, client):
     ''' output data into a json file
@@ -58,12 +66,13 @@ def output_data(is_author, client):
     with open("data.json", "w") as file:
         file.write(json_data)
 
-def already_exist(id, is_author, client):
+def already_exist(id, is_author, is_test, client):
     ''' check if id already exist
 
     Args:
         id: id to check
         is_author: true if check in author table. false otherwise
+        is_test: true if use the collection for unit testing
         client: client to use
     '''
     if client is None:
@@ -73,8 +82,11 @@ def already_exist(id, is_author, client):
     collection = db["book"]
     if is_author:
         collection = db["author"]
-    
-    if collection.find({"_id" : id}).limit(1).count() != 0:
+
+    if is_test:
+        collection = db["test"]
+
+    if collection.count_documents({"_id": id}) != 0:
         return True
 
     return False

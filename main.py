@@ -4,8 +4,9 @@ and run corresponding functions
 '''
 import argparse
 import requests
-import scrapper
 from scrapper import *
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 '''
 url prefix for goodreads
@@ -27,10 +28,18 @@ def check_if_url_valid(url):
 
     # check if url points to a book page in goodreads first
     # avoid making unnecessary request
-    if (BOOK in url and GOODREADS_URL in url):
-        response = requests.get(url)
-        if response:
-            return response
+
+    validate = URLValidator()
+    try:
+        validate(url)
+        if (BOOK in url and GOODREADS_URL in url):
+            response = requests.get(url)
+            if response:
+                return response
+    except ValidationError as exception:
+       return None
+    
+    
     return None
 
 
@@ -47,16 +56,16 @@ if __name__ == "__main__":
         num_books = int(scrap_args[1])
         num_authors = int(scrap_args[2])
         
-        print(url)
         result = check_if_url_valid(url)
         if (result is None):
-            print("invalid")
+            print("invalid url")
         else:
             print("valid")
             scrapper = Scrapper(url, num_books, num_authors)
+            scrapper.initial_scrap()
             
-        print(num_books)
-        print(num_authors)
+        if (num_books > 200 or num_authors > 2):
+            print("warning: this is a really large number to scarp")
 
         
 
