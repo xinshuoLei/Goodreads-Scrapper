@@ -86,11 +86,9 @@ class Scrapper:
             # get all books of current author first
             author_books = self._current_author["author_books"]
             for book_url in author_books:
-                print(book_url)
                 if self._book_count >= self._num_books:
                     break
                 book_id = self.find_id_in_url(book_url)
-                print(book_id)
 
                 # check if book is already scrapped
                 if database.already_exist(book_id, False, False, self._client):

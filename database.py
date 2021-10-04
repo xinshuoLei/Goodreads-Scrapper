@@ -1,8 +1,11 @@
-from os import close
+from os import close, name
 import pymongo
 from bson.json_util import *
 
-
+'''
+This file contains function that insert data into database
+and retrieve data from database
+'''
 def connect_to_server():
     ''' try to connect to server
 
@@ -12,16 +15,13 @@ def connect_to_server():
     try:
         #The ismaster command is cheap and does not require auth.
         client.admin.command('ismaster')
+        print("connected to server")
         return client
     except pymongo.errors.ConnectionFailure:
         print("Server not available")
         return None
     
 
-'''
-This file contains function that insert data into database
-and retrieve data from database
-'''
 def insert_data(is_author, is_test, data, client):
     ''' insert data into database
 
@@ -103,4 +103,29 @@ def close_client(client):
 
     client.close()
 
+def find_and_output(client, arg, table, is_projection):
+    ''' run find on data table using arg, then output result to a JSON file
 
+    Args:
+        client: client to use
+        arg: arg for find()
+        table: table to use find() on
+    '''
+    db = client["goodreads"]
+    cursor = db[table].find({}, arg)
+    list_cur = list(cursor)
+    json_data = dumps(list_cur, indent=2)
+    with open("query.json", "w") as file:
+        file.write(json_data)
+
+if __name__ == "__main__":
+    client = connect_to_server()
+    db = client["goodreads"]
+    
+    cursor = db["author"].find({}, {'_id': 0, 'rating': 1})
+    list_cur = list(cursor)
+    json_data = dumps(list_cur, indent=2)
+    with open("data.json", "w") as file:
+        file.write(json_data)
+
+    close_client(client)
