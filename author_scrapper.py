@@ -43,15 +43,20 @@ class AuthorScrapper:
         books_url = []
         actionLinks = self._soup.find_all("a", class_="actionLink", 
         style="float: right")
+        more_book_url = None
         for one_actionLink in actionLinks:
             if ("More books" in one_actionLink.get_text()):
                 more_book_url = one_actionLink["href"]
-        more_book_url = self._GOODREADS_URL + more_book_url
+                more_book_url = self._GOODREADS_URL + more_book_url
 
         response = None
         # check if there is a more books link
-        if more_book_url:
-            response = requests.get(more_book_url)
+        if more_book_url is None:
+            self._info["author_books"] = None
+            return
+        
+        
+        response = requests.get(more_book_url)
         books_soup = bs4.BeautifulSoup(response.text, "html.parser")
         
         # get urls on first page

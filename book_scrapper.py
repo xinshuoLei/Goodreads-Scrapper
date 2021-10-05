@@ -26,7 +26,7 @@ class BookScrapper():
         ''' use request to download html
 
         '''
-        response = requests.get(self._book_url)
+        response = requests.get(self._book_url, timeout=None)
         if response:
             self._soup = bs4.BeautifulSoup(response.text, "html.parser")
             # scrap infos
@@ -41,9 +41,15 @@ class BookScrapper():
         '''
         # get and remove blank spaces
         rating_component = self._soup.find("span", itemprop="ratingValue")
-        self._info["rating"] = rating_component.get_text().strip()
+        if rating_component is None:
+            self._info["rating"] = None
+        else:
+            self._info["rating"] = rating_component.get_text().strip()
         rating_count_component = self._soup.find("meta", itemprop="ratingCount")
-        self._info["rating_count"] = rating_count_component["content"].strip()
+        if rating_count_component is None:
+            self._info["rating_count"] = None
+        else:
+            self._info["rating_count"] = rating_count_component["content"].strip()
         
 
 
@@ -53,33 +59,57 @@ class BookScrapper():
         soup = self._soup
         
         # title
-        title = soup.find("h1", id="bookTitle").get_text()
-        # remove new line and white space
-        self._info["title"] = title.replace("\n", "").strip()
+        title_component = soup.find("h1", id="bookTitle")
+        if title_component is None:
+            self._info["title"] = None
+        else:
+            title = title_component.get_text()
+            # remove new line and white space
+            self._info["title"] = title.replace("\n", "").strip()
         
         # ISBN
         book_data = soup.find("div", id="bookDataBox")
-        clear_floats = book_data.find_all("div", class_ = "clearFloats")
-        # iterate through all clearFloats class, find the one with title as ISBN
-        for one in clear_floats:
-            if one.find("div", class_ = "infoBoxRowTitle").get_text() == "ISBN":
-                isbn_component = one.find("div", class_ = "infoBoxRowItem")
-                # get text and remove blank spaces and newline
-                self._info["ISBN"] = isbn_component.get_text().replace("\n", " ").replace(" ", "")
+        if book_data is None:
+            self._info["ISBN"] = None
+        else:
+            clear_floats = book_data.find_all("div", class_ = "clearFloats")
+            # iterate through all clearFloats class, find the one with title as ISBN
+            for one in clear_floats:
+                if one.find("div", class_ = "infoBoxRowTitle").get_text() == "ISBN":
+                    isbn_component = one.find("div", class_ = "infoBoxRowItem")
+                    # get text and remove blank spaces and newline
+                    self._info["ISBN"] = isbn_component.get_text().replace("\n", " ").replace(" ", "")
 
         # review count
-        self._info["review_count"] = soup.find("meta", itemprop="reviewCount")["content"].strip()
+        review_count_component = soup.find("meta", itemprop="reviewCount")
+        if review_count_component is None:
+            self._info["review_count"] = None
+        else:
+            self._info["review_count"] = soup.find("meta", itemprop="reviewCount")["content"].strip()
 
         # url of cover image
-        self._info["image_url"] = soup.find("img", id="coverImage")["src"]
+        image_component = soup.find("img", id="coverImage")
+        if image_component is None:
+            self._info["image_url"] = None
+        else:
+            self._info["image_url"] = image_component["src"]
 
         
     def get_author_info(self):
         ''' get author info including author name and url of author page
         '''
         soup = self._soup
-        self._info["author"] = soup.find("span", itemprop="name").get_text()
-        self._info["author_url"] = soup.find("a", {"class": "authorName", 
+        author_component = soup.find("span", itemprop="name")
+        if author_component is None:
+            self._info["author"] = None
+        else:
+            self._info["author"] = author_component.get_text()
+        author_url_component = soup.find("a", {"class": "authorName", 
+            "itemprop": "url"})
+        if author_url_component is None:
+            self._info["author_url"] = None
+        else:
+            self._info["author_url"] = soup.find("a", {"class": "authorName", 
             "itemprop": "url"})["href"]
 
         
@@ -87,7 +117,11 @@ class BookScrapper():
         '''get url of all similar books
         '''
         # url of the page that contains all similar books
-        similar_books_page = self._soup.find("a", class_="actionLink right seeMoreLink")["href"]
+        similar_books_url = self._soup.find("a", class_="actionLink right seeMoreLink")
+        if similar_books_url is None:
+            self._info["similar_books"] = None
+            return
+        similar_books_page = similar_books_url["href"]
         response = requests.get(similar_books_page)
         if response:
             similar_book_soup = bs4.BeautifulSoup(response.text, "html.parser")

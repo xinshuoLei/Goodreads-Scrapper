@@ -9,7 +9,7 @@ from scrapper import *
 from main import *
 
 '''
-This file contains all unit test for this assignment
+This file contains all unit test for scrapper
 '''
 
 class ScrapperTest(unittest.TestCase):
@@ -65,39 +65,39 @@ class ScrapperTest(unittest.TestCase):
     def test_check_insert_into_database(self):
         ''' test the insert function does insert data into database
         '''
-        client = database.connect_to_server()
+        client = connect_to_server()
         original_size = client["goodreads"]["test"].count_documents({})
         if client is not None:
-            database.insert_data(False, True, {"test_key": "1"}, client)
+            insert_data(False, True, {"test_key": "1"}, client)
             current_size = client["goodreads"]["test"].count_documents({})
             self.assertEqual(original_size+1, current_size)
-            database.close_client(client)
+            close_client(client)
 
     def test_already_exists_true(self):
         ''' test the already_exist() function in database return true for an
         id that already exist
         '''
-        client = database.connect_to_server()
+        client = connect_to_server()
         if client is not None:
-            id = database.insert_data(False, True, {"test_key": "2"}, client)
+            id = insert_data(False, True, {"test_key": "2"}, client)
             self.assertEqual(True, already_exist(id.inserted_id, False, True, client))
-            database.close_client(client)
+            close_client(client)
 
     def test_already_exists_false(self):
         ''' test the already_exist() function in database return false for an
         id that does not exist
         '''
-        client = database.connect_to_server()
+        client = connect_to_server()
         if client is not None:
             self.assertEqual(False, already_exist("4", False, True, client))
-            database.close_client(client)
+            close_client(client)
     
     def test_output_valid_json(self):
         ''' test database output is a valid json
         '''
-        client = database.connect_to_server()
-        database.output_data(True, client)
-        database.close_client(client)
+        client = connect_to_server()
+        output_data(True, client)
+        close_client(client)
         self.assertEqual(True, self.is_valid_json())
 
     def is_valid_json(self):
