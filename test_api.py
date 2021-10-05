@@ -7,8 +7,6 @@ This file contains all unit test for this assignment
 '''
 
 class ApiTest(unittest.TestCase):
-    
-    '''
     def test_get_id(self):
         resp = app.test_client().get("/author?id=18")
         self.assertEqual(200, resp.status_code)
@@ -90,7 +88,6 @@ class ApiTest(unittest.TestCase):
             file.write(resp_get.get_json())
         # delete in the end so unit test can be reused
         app.test_client().delete("/author?id=123456")
-    '''
 
     def test_update_and_get(self):
         update = {"rating_count": "50000"}
