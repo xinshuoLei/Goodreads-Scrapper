@@ -20,7 +20,7 @@ def connect_to_server():
     except pymongo.errors.ConnectionFailure:
         print("Server not available")
         return None
-    
+
 
 def insert_data(is_author, is_test, data, client):
     ''' insert data into database
@@ -110,22 +110,18 @@ def find_and_output(client, arg, table, is_projection):
         client: client to use
         arg: arg for find()
         table: table to use find() on
+
+    Return:
+        json data
     '''
     db = client["goodreads"]
-    cursor = db[table].find({}, arg)
-    list_cur = list(cursor)
-    json_data = dumps(list_cur, indent=2)
-    with open("query.json", "w") as file:
-        file.write(json_data)
-
-if __name__ == "__main__":
-    client = connect_to_server()
-    db = client["goodreads"]
+    cursor = None
+    if is_projection:
+        cursor = db[table].find({}, arg)
+    else:
+        cursor = db[table].find(arg)
     
-    cursor = db["author"].find({}, {'_id': 0, 'rating': 1})
+    #transform cursor to json data
     list_cur = list(cursor)
     json_data = dumps(list_cur, indent=2)
-    with open("data.json", "w") as file:
-        file.write(json_data)
-
-    close_client(client)
+    return json_data

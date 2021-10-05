@@ -9,7 +9,7 @@ from scrapper import *
 from main import *
 
 '''
-This file contains all unit test for this assignment
+This file contains all unit test for scrapper
 '''
 
 class ScrapperTest(unittest.TestCase):

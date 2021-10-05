@@ -3,7 +3,7 @@ This file contains the main function, which check command line arguments
 and run corresponding functions
 '''
 import argparse
-from pymongo.database import Database
+import database
 import requests
 from scrapper import *
 from django.core.validators import URLValidator
@@ -41,10 +41,62 @@ def check_if_url_valid(url):
     except ValidationError as exception:
        return None
     
-    
     return None
 
+def write_json_data_to_file(json_data, file_name):
+    ''' write json data to file
 
+    Args:
+        json_data: json data
+        file_name: output filename
+    '''
+    with open(file_name, "w") as file:
+        file.write(json_data)
+
+
+def handle_scrap(scrap_args):
+    ''' function that handle the scrap flag
+
+    Args:
+        scrap_args: args for scrap
+    '''
+    url = scrap_args[0];
+    num_books = int(scrap_args[1])
+    num_authors = int(scrap_args[2])
+
+    if (num_books > 200 or num_authors > 50):
+        print("warning: this is a really large number to scarp")
+
+    result = check_if_url_valid(url)
+    if (result is None):
+        print("invalid url")
+    else:
+        print("valid url")
+        scrapper = Scrapper(url, num_books, num_authors)
+        scrapper.initial_scrap()
+
+
+def handle_output():
+    ''' function that handle the output flag
+
+    Args:
+        scrap_args: args for output
+    '''
+    if (output_arg == "author"):
+        client = database.connect_to_server()
+        if client is not None:
+            database.output_data(True, client)
+        database.close_client(client)
+        print("output table author to data.json")
+    elif (output_arg == "book"):
+        client = database.connect_to_server()
+        if client is not None:
+            database.output_data(False, client)
+        database.close_client(client)
+        print("output table book to data.json")
+    else:
+        print("invalid argument")
+        
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -53,59 +105,36 @@ if __name__ == "__main__":
     parser.add_argument("-query", nargs=1, help="only argument is the query." 
         + " please place query in single quotes")
     args = vars(parser.parse_args())
+    BookScrapper
 
     # program was run with flag scrap
     if args["scrap"] is not None:
         scrap_args = args["scrap"]
-        url = scrap_args[0];
-        num_books = int(scrap_args[1])
-        num_authors = int(scrap_args[2])
-
-        if (num_books > 200 or num_authors > 50):
-            print("warning: this is a really large number to scarp")
-        
-        result = check_if_url_valid(url)
-        if (result is None):
-            print("invalid url")
-        else:
-            print("valid url")
-            scrapper = Scrapper(url, num_books, num_authors)
-            scrapper.initial_scrap()
+        handle_scrap(scrap_args)
             
     # program was run with output flag
     elif args["output"] is not None:
         output_arg = args["output"][0]
-        if (output_arg == "author"):
-            client = database.connect_to_server()
-            if client is not None:
-                database.output_data(True, client)
-            database.close_client(client)
-            print("output table author to data.json")
-        elif (output_arg == "book"):
-            client = database.connect_to_server()
-            if client is not None:
-                database.output_data(False, client)
-            database.close_client(client)
-            print("output table book to data.json")
-        else:
-            print("invalid argument")
+        handle_output()
 
     # program was run with query flag
     elif args["query"] is not None:
         query = args["query"][0]
-        parse_result = parse_whole_argument(query)
+        error = []
+        parse_result = parse_whole_argument(query, error)
         if parse_result:
             client = database.connect_to_server()
             if client is not None:
-                if len(parse_result) != 2:
-                    database.find_and_output(client, parse_result[1], 
-                        parse_result[2], True)
-                else:
-                    database.find_and_output(client, parse_result[0], 
+                json_data = database.find_and_output(client, parse_result[0], 
                             parse_result[1], False)
+                if len(parse_result) != 2:
+                    json_data = database.find_and_output(client, parse_result[1], 
+                        parse_result[2], True)
+                write_json_data_to_file(json_data, "query.json")
                 print("output query result to query.json")
             database.close_client(client)
-        
+        else:
+            print(error)
 
 
         
