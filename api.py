@@ -1,5 +1,5 @@
 from collections import UserList
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from bson.json_util import *
 from pymongo import database
 from author_scrapper import AuthorScrapper
@@ -195,6 +195,7 @@ def handle_author():
                     resp.status_code = 400
                 
         resp = jsonify(json_data)
+        
         close_client(client)
     else:
         # user did not provide id, which is only valid for post request
@@ -204,7 +205,8 @@ def handle_author():
         else:
             resp = jsonify({'message': 'Bad Request'})
             resp.status_code = 400
-
+    
+    resp.headers.add('Access-Control-Allow-Origin', '*')
     return resp
 
 
@@ -259,6 +261,7 @@ def handle_book():
             resp = jsonify({'message': 'Bad Request'})
             resp.status_code = 400
 
+    resp.headers.add('Access-Control-Allow-Origin', '*')
     return resp
 
 
@@ -353,5 +356,17 @@ def handle_scrape():
     close_client(client)
     return resp
 
+@app.route('/<path:path>')
+def serve_page(path):
+    return send_from_directory("frontend", path)
+
+@app.route("/vis/top-authors")
+def author_visualization():
+    return send_from_directory("frontend", "top_author.html")
+
+@app.route("/vis/top-books")
+def book_visualizarion():
+    return send_from_directory("frontend", "top_book.html")
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=105)
+    app.run(host='0.0.0.0', port=5000)
