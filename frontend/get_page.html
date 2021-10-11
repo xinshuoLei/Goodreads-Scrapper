@@ -17,6 +17,9 @@
   <div id="bookTable"></div>
 </form>
 <script>
+  /**
+   * constant for error in api response
+   */
   const ERROR = 'error'
 
   /**
@@ -25,13 +28,14 @@
    * @isAuthor: true if the json data is about author. false otherwise
    */
   function json_to_table(jsonData, isAuthor) {
+    // check for error
     if (jsonData.includes(ERROR)) {
       // report error
-      console.log('true')
       var divContainer = document.getElementById('authorTable');
       divContainer.innerHTML = 'No such id exists in the database'
       return;
     }
+
     data = JSON.parse(jsonData)[0]
     // create empty table and center table
     var table = document.createElement('table')
@@ -73,14 +77,14 @@
     
     divContainer.innerHTML = "";
     divContainer.appendChild(table);
-}
+  }
+
   /**
    * function that get author info by making a get request
    */ 
   const getAuthorInfo = (ev) => {
     ev.preventDefault();
     var id = document.getElementById("authorId").value;
-    alert(id)
     if (id) {
       // if id is not blank, make a get request to /author with id
       fetch(`/author?id=${id}`,  { method: "GET"})
@@ -90,13 +94,13 @@
       })
     } 
   }
+
   /**
    * function that get book info by making a get request
    */ 
    const getBookInfo = (ev) => {
     ev.preventDefault();
     var id = document.getElementById("bookId").value;
-    alert(id)
     if (id) {
       // if id is not blank, make a get request to /book with id
       fetch(`/book?id=${id}`,  { method: "GET"})
@@ -106,10 +110,12 @@
       })
     } 
   }
+
   // click listener for get buttons
   document.addEventListener("DOMContentLoaded", ()=> {
     document.getElementById("getAuthor").addEventListener("click", getAuthorInfo)
   });
+
   document.addEventListener("DOMContentLoaded", ()=> {
     document.getElementById("getBook").addEventListener("click", getBookInfo)
   });

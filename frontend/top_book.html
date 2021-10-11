@@ -1,0 +1,70 @@
+<div style="margin:0 auto;text-align:center;">
+    <p>Top book</p>
+    <p>Please enter the number of top-rated author you want to display below</p>
+    <form>
+        <p>
+        <label for="display num" required>Display number:</label>
+        <input type="text" id="displayNum"> 
+        </p>
+        <button id="displayButton">Display</button>
+    </form>
+    </body>
+</div>
+<script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+/**
+ * function to display table
+ */
+const displayTable = (ev) => {
+  ev.preventDefault();
+  // first parse json data
+  d3.json("/static/book_data.json")
+  .then(function(data) {
+    function jsonToTable(data, columns, k) {
+      // remove existig tables
+      d3.select('table').remove()
+      var table = d3.select('body').append('table')
+      table.attr("align", "center")
+      var thead = table.append('thead')
+      var	tbody = table.append('tbody');
+
+      // append the header row
+      thead.append('tr')
+        .selectAll('th')
+        .data(columns).enter()
+        .append('th')
+          .text(function (column) { return column; });
+
+      // get user input for k
+      var k = document.getElementById("displayNum").value;
+      // create a row for each data entry
+      var rows = tbody.selectAll('tr')
+        .data(data.slice(0,k))
+        .enter()
+        .append('tr');
+
+      // create a cell in each row for each column
+      var cells = rows.selectAll('td')
+        .data(function (row) {
+          return columns.map(function (column) {
+            return {column: column, value: row[column]};
+          });
+        })
+        .enter()
+        .append('td')
+          .text(function (d) { return d.value; })
+
+      return table;
+    }
+
+    // render the table with only selected columns
+    jsonToTable(data, ['_id', 'author', 'title', 'rating'])
+  })
+  
+}
+
+// listener for the display button
+document.addEventListener("DOMContentLoaded", ()=> {
+  document.getElementById("displayButton").addEventListener("click", displayTable)
+});
+</script>

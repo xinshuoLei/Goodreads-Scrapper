@@ -1,5 +1,5 @@
 from collections import UserList
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, render_template
 from bson.json_util import *
 from pymongo import database
 from author_scrapper import AuthorScrapper
@@ -10,7 +10,7 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 import requests
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/static")
 AUTHOR = "author"
 BOOK = "book"
 GOODREADS_URL = "https://www.goodreads.com"
@@ -362,10 +362,18 @@ def serve_page(path):
 
 @app.route("/vis/top-authors")
 def author_visualization():
+    client = connect_to_server();
+    if client:
+        output_data(True, client)
+        close_client(client)
     return send_from_directory("frontend", "top_author.html")
 
 @app.route("/vis/top-books")
 def book_visualizarion():
+    client = connect_to_server();
+    if client:
+        output_data(False, client)
+        close_client(client)
     return send_from_directory("frontend", "top_book.html")
 
 if __name__ == "__main__":
