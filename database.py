@@ -60,10 +60,13 @@ def output_data(is_author, client):
     collection = db["book"]
     if (is_author):
         collection = db["author"]
-    cursor = collection.find()
+    cursor = collection.find().sort("rating", -1)
     list_cur = list(cursor)
     json_data = dumps(list_cur, indent=2)
-    with open("data.json", "w") as file:
+    filename = "static/book_data.json"
+    if is_author:
+        filename = "static/author_data.json"
+    with open(filename, "w") as file:
         file.write(json_data)
 
 def already_exist(id, is_author, is_test, client):

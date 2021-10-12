@@ -1,0 +1,83 @@
+<p>Please enter the author/book id below.</p>
+<p>click "Delete" to delete information about author/book in the database</p>
+<link rel="stylesheet" href = "style.css">
+<form>
+  <p>
+    <label for="author id" required>Author Id:</label>
+    <input type="text" id="authorId"> 
+  </p>
+  <button id="deleteAuthor">Delete</button>
+  <p>
+    <label for="book id" required>Book Id:</label>
+    <input type="text" id="bookId"> 
+  </p>
+  <button id="deleteBook">Delete</button>
+  <p>&nbsp;</p> 
+  <div id="authorTable"></div>
+  <p>&nbsp;</p> 
+  <div id="bookTable"></div>
+</form>
+<script>
+  /**
+   * constant for error in api response
+   */
+  const ERROR = 'error'
+
+  /**
+   * function that parse json data to a html table
+   * @param jsonData: the json data to parse
+   */
+  function display_response(jsonData) {
+    var divContainer = document.getElementById('authorTable');
+    // check for error
+    if (jsonData.includes(ERROR)) {
+      // report error
+      console.log(divContainer)
+      divContainer.innerHTML = 'No such id exists in the database'
+      return;
+    }
+
+    divContainer.innerHTML = 'Successfully deleted'
+  }
+
+  /**
+   * function that get author info by making a get request
+   */ 
+  const getAuthorInfo = (ev) => {
+    ev.preventDefault();
+    var id = document.getElementById("authorId").value;
+    if (id) {
+      // if id is not blank, make a get request to /author with id
+      fetch(`/author?id=${id}`,  { method: "DELETE"})
+      .then(response => response.json())  
+      .then(json => {
+        display_response(json)
+      })
+    } 
+  }
+
+  /**
+   * function that get book info by making a get request
+   */ 
+   const getBookInfo = (ev) => {
+    ev.preventDefault();
+    var id = document.getElementById("bookId").value;
+    if (id) {
+      // if id is not blank, make a get request to /book with id
+      fetch(`/book?id=${id}`,  { method: "DELETE"})
+      .then(response => response.json())  
+      .then(json => {
+        display_response(json)
+      })
+    } 
+  }
+
+  // click listener for get buttons
+  document.addEventListener("DOMContentLoaded", ()=> {
+    document.getElementById("deleteAuthor").addEventListener("click", getAuthorInfo)
+  });
+
+  document.addEventListener("DOMContentLoaded", ()=> {
+    document.getElementById("deleteBook").addEventListener("click", getBookInfo)
+  });
+</script>

@@ -1,5 +1,5 @@
 from collections import UserList
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory, render_template
 from bson.json_util import *
 from pymongo import database
 from author_scrapper import AuthorScrapper
@@ -10,7 +10,7 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 import requests
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/static")
 AUTHOR = "author"
 BOOK = "book"
 GOODREADS_URL = "https://www.goodreads.com"
@@ -88,6 +88,7 @@ def update_data_by_id(table, id, client, update):
     # check updates are all valid
     for key in update.keys():
         if key not in ATTRIBUTES[table]:
+            print(key)
             error = {"error:" "attribute does not exist"}
             json_data = dumps(error, indent=2)
             return json_data
@@ -195,6 +196,7 @@ def handle_author():
                     resp.status_code = 400
                 
         resp = jsonify(json_data)
+        
         close_client(client)
     else:
         # user did not provide id, which is only valid for post request
@@ -204,7 +206,8 @@ def handle_author():
         else:
             resp = jsonify({'message': 'Bad Request'})
             resp.status_code = 400
-
+    
+    resp.headers.add('Access-Control-Allow-Origin', '*')
     return resp
 
 
@@ -259,6 +262,7 @@ def handle_book():
             resp = jsonify({'message': 'Bad Request'})
             resp.status_code = 400
 
+    resp.headers.add('Access-Control-Allow-Origin', '*')
     return resp
 
 
@@ -353,5 +357,25 @@ def handle_scrape():
     close_client(client)
     return resp
 
+@app.route('/<path:path>')
+def serve_page(path):
+    return send_from_directory("frontend", path)
+
+@app.route("/vis/top-authors")
+def author_visualization():
+    client = connect_to_server();
+    if client:
+        output_data(True, client)
+        close_client(client)
+    return send_from_directory("frontend", "top_author.html")
+
+@app.route("/vis/top-books")
+def book_visualizarion():
+    client = connect_to_server();
+    if client:
+        output_data(False, client)
+        close_client(client)
+    return send_from_directory("frontend", "top_book.html")
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=105)
+    app.run(host='0.0.0.0', port=5000)

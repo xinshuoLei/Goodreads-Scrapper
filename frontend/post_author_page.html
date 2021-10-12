@@ -1,0 +1,116 @@
+<p>Please provide the author information below. All empty fields will be set to null when inserting</p>
+<p>Click "Add" to insert the author into database.</p>
+<link rel="stylesheet" href="style.css"> 
+<form>
+  <p>
+    <label for="id">Author Id:</label>
+    <input type = "string" id="author_id">
+  </p>
+  <p>
+    <label for="author url">Author Url:</label>
+    <input type="string" id="author_url">
+  </p>
+  <p>
+    <label for="name" required>Name:</label>
+    <input type="string" id="author_name"> 
+  </p>
+  <p>
+    <label for="review count">Reveiew Count:</label>
+    <input type="string" id="review_count">
+  </p>
+  <p>
+    <label for="image url">Image url:</label>
+    <input type="string" id="image_url">
+  </p>
+  <p>
+    <label for="rating">Rating:</label>
+    <input type="string" id="rating">
+  </p>
+  <p>
+    <label for="rating count">Rating Count:</label>
+    <input type="string" id="rating_count">
+  </p>
+  <p>
+    <label for="review count">Author books:</label>
+    <input type="string" id="author_books">
+  </p>
+  <p>
+    <label for="image url">Related Authors:</label>
+    <input type="string" id="related_authors">
+  </p>
+  <button id="button1">Add</button>
+  <p>&nbsp;</p>
+  <div id="message"></div>
+</form>
+<script>
+
+  /**
+   * constant for error in api response
+   */
+   const ERROR = 'error'
+
+  /**
+   * function that parse json data to a html table
+   * @param jsonData: the json data to parse
+   * @isAuthor: true if the json data is about author. false otherwise
+   */
+  function displayResponse(jsonData, isAuthor) {
+    var divContainer = document.getElementById('message');
+    // check for error
+    if (jsonData.includes(ERROR)) {
+      // report error
+      console.log(divContainer)
+      divContainer.innerHTML = 'book/author with this id already exists'
+      return;
+    }
+
+    divContainer.innerHTML = 'Successfully added'
+  }
+
+  /**
+   * function for adding an author
+   */
+  const addAuthor = (ev) => {
+    ev.preventDefault();
+    var name = document.getElementById("author_name").value;
+    var id = document.getElementById("author_id").value;
+    var author_url = document.getElementById("author_url").value;
+    var review_count = document.getElementById("review_count").value;
+    var rating = document.getElementById("rating").value;
+    var rating_count = document.getElementById("rating_count").value;
+    var image_url = document.getElementById("image_url").value;
+    var author_books = document.getElementById("author_books").value;
+    var related_authors = document.getElementById("related_authors").value;
+    
+    let authorInfo = {
+      _id : id,
+      name: name,
+      author_url : author_url,
+      review_count : review_count,
+      image_url : image_url,
+      rating : rating,
+      rating_count : rating_count,
+      author_books : author_books,
+      related_authors : related_authors
+    };
+    // make a fetch request
+    fetch('/author', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(authorInfo)
+    })
+    .then(res => res.json())
+    .then(json => {
+      displayResponse(json)
+    })
+    document.forms[0].reset()
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=> {
+    document.getElementById('button1').addEventListener('click', addAuthor)
+  });
+
+</script>
