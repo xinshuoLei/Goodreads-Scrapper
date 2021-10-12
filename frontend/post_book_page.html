@@ -1,0 +1,122 @@
+<p>Please provide the book information below. All empty fields will be set to null when inserting</p>
+<p>Click "Add" to insert the book into database.</p>
+<link rel="stylesheet" href="style.css"> 
+<form>
+  <p>
+    <label for="id">Book ID:</label>
+    <input type = "int" id="book_id">
+  </p>
+  <p>
+    <label for="title" required>Book Title:</label>
+    <input type="text" id="book_title"> 
+  </p>
+  <p>
+    <label for="ISBN">ISBN:</label>
+    <input type="int" id="ISBN">
+  </p>
+  <p>
+    <label for="author url">Author URL:</label>
+    <input type="char" id="author_url">
+  </p>
+  <p>
+    <label for="author">Author:</label>
+    <input type="string" id="author">
+  </p>
+  <p>
+    <label for="rating">Rating:</label>
+    <input type="float" id="rating">
+  </p>
+  <p>
+    <label for="rating count">Rating Count:</label>
+    <input type="int" id="rating_count">
+  </p>
+  <p>
+    <label for="review count">Review Count:</label>
+    <input type="int" id="review_count">
+  </p>
+  <p>
+    <label for="image url">Image URL:</label>
+    <input type="string" id="image_url">
+  </p>
+  <p>
+    <label for="similar books">Similar Books:</label>
+    <input type="similar books" id="similar_books">
+  </p>
+  <button id="button1">Add</button>
+  <p>&nbsp;</p>
+  <div id="message"></div>
+</form>
+<script>
+
+  /**
+   * constant for error in api response
+   */
+   const ERROR = 'error'
+
+  /**
+   * function that parse json data to a html table
+   * @param jsonData: the json data to parse
+   * @isAuthor: true if the json data is about author. false otherwise
+   */
+  function displayResponse(jsonData, isAuthor) {
+    var divContainer = document.getElementById('message');
+    // check for error
+    if (jsonData.includes(ERROR)) {
+      // report error
+      console.log(divContainer)
+      divContainer.innerHTML = 'book/author with this id already exists'
+      return;
+    }
+
+    divContainer.innerHTML = 'Successfully added'
+  }
+
+  /**
+   * function for adding a book
+   */
+  const addBook = (ev) => {
+    ev.preventDefault();
+    var title = document.getElementById("book_title").value;
+    var id = document.getElementById("book_id").value;
+    var isbn = document.getElementById("ISBN").value;
+    var author_url = document.getElementById("author_url").value;
+    var author = document.getElementById("author").value;
+    var rating = document.getElementById("rating").value;
+    var rating_count = document.getElementById("rating_count").value;
+    var review_count = document.getElementById("review_count").value;
+    var image_url = document.getElementById("image_url").value;
+    var similar_books = document.getElementById("similar_books").value;
+    // get and store all book info
+    let bookInfo = {
+      title : title,
+      _id : id,
+      ISBN : isbn,
+      author_url : author_url,
+      author : author,
+      rating : rating,
+      rating_count : rating_count,
+      review_count : review_count,
+      image_url : image_url,
+      similar_books : similar_books
+    };
+    // fetch a post request
+    fetch('/book', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bookInfo)
+    })
+    .then(res => res.json())
+    .then(json => {
+      displayResponse(json)
+    })
+    document.forms[0].reset()
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=> {
+    document.getElementById('button1').addEventListener('click', addBook)
+  });
+
+</script>

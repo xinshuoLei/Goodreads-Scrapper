@@ -26,9 +26,8 @@
   /**
    * function that parse json data to a html table
    * @param jsonData: the json data to parse
-   * @isAuthor: true if the json data is about author. false otherwise
    */
-  function json_to_table(jsonData, isAuthor) {
+  function display_response(jsonData) {
     var divContainer = document.getElementById('authorTable');
     // check for error
     if (jsonData.includes(ERROR)) {
@@ -52,7 +51,7 @@
       fetch(`/author?id=${id}`,  { method: "DELETE"})
       .then(response => response.json())  
       .then(json => {
-        json_to_table(json, true)
+        display_response(json)
       })
     } 
   }
@@ -68,7 +67,7 @@
       fetch(`/book?id=${id}`,  { method: "DELETE"})
       .then(response => response.json())  
       .then(json => {
-        json_to_table(json, false)
+        display_response(json)
       })
     } 
   }

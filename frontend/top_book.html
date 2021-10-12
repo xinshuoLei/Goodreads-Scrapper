@@ -41,9 +41,9 @@
     // remove all previous bar plots
     d3.select("svg").remove()
     
-    var margin = {top: 20, right: 20, bottom: 150, left: 40},
+    var margin = {top: 20, right: 20, bottom: 280, left: 40},
     width = 900 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 600 - margin.top - margin.bottom;
 
     var x = d3.scale.ordinal().rangeRoundBands([0, width], .08);
     // range for rating is 0-5

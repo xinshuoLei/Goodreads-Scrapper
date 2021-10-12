@@ -1,5 +1,5 @@
-<p>Please enter the author/book id below and click "Get" to get information about author/book.</p>
 <link rel="stylesheet" href = "style.css">
+<p>Please enter the author/book id below and click "Get" to get information about author/book.</p>
 <form>
   <p>
     <label for="author id" required>Author Id:</label>
@@ -31,7 +31,10 @@
     // check for error
     if (jsonData.includes(ERROR)) {
       // report error
-      var divContainer = document.getElementById('authorTable');
+      var divContainer = document.getElementById('bookTable');
+      if (isAuthor) {
+        divContainer = document.getElementById('authorTable')
+      }
       divContainer.innerHTML = 'No such id exists in the database'
       return;
     }

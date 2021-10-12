@@ -88,6 +88,7 @@ def update_data_by_id(table, id, client, update):
     # check updates are all valid
     for key in update.keys():
         if key not in ATTRIBUTES[table]:
+            print(key)
             error = {"error:" "attribute does not exist"}
             json_data = dumps(error, indent=2)
             return json_data
