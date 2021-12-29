@@ -1,2 +1,2 @@
-# fa21-cs242-assignment2
+# Assignment 2 of Programming Studio @ UIUC
 
